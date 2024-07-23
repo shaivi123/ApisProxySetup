@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  nordvpn:
+    image: bubuntux/nordvpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TOKEN=e9f2ab1346dd235938e478812fee2d88bcd29b2a60ea56194c7eb6e9180a13ed
+      - CONNECT=United_States  # Explicitly connect to a US server
+      - NETWORK=192.168.1.0/24
+      - NORDVPN_COUNTRY=United_States  # Explicitly set the country
+      - NORDVPN_CATEGORY=standard  # Optional, specify category if needed
+    ports:
+      - "80:80"    # Expose the HTTP port
+      - "443:443"  # Expose the HTTPS port if needed
+    devices:
+      - /dev/net/tun
+    restart: always
+  reverse-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Correct path to nginx.conf
+      - ./certs:/etc/nginx/certs           # Mount certificates directory for NGINX
+    depends_on:
+      - nordvpn
+    restart: always
+    network_mode: service:nordvpn  # Share network with nordvpn service
+
+  nordvpn-v2:
+    image: bubuntux/nordvpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TOKEN=e9f2ab1346dd235938e478812fee2d88bcd29b2a60ea56194c7eb6e9180a13ed
+      - CONNECT=Italy  # Explicitly connect to a US server
+      - NETWORK=192.168.1.0/24
+      - NORDVPN_COUNTRY=Italy  # Explicitly set the country
+      - NORDVPN_CATEGORY=standard  # Optional, specify category if needed
+    ports:
+      - "82:82"    # Expose the HTTP port
+      - "446:446"  # Expose the HTTPS port if needed
+    devices:
+      - /dev/net/tun
+    restart: always
+  reverse-proxy-v2:
+    build:
+      context: .
+      dockerfile: DockerfileV2
+    volumes:
+      - ./nginxv2.conf:/etc/nginx/nginx.conf  # Correct path to nginx.conf
+      - ./certs:/etc/nginx/certs           # Mount certificates directory for NGINX
+    depends_on:
+      - nordvpn-v2
+    restart: always
+    network_mode: service:nordvpn-v2  # Share network with nordvpn service
+    
+    # in PostMan: GET  | http://localhost |header: Connection=keep-alive , X-Proxy-URL=https://api.ipdata.co?api-key=93496b5c15d334d2ef27da33047f4a67b21043038fe3c0b48ad6ee82,
+    # X-Proxy-Host=api.ipdata.co,X-Proxy-Ip=8.8.8.8, Cookie=__cflb=0H28vFHtoAR1ohjxFffpsanyHA9PyT2YRgKduTeAheC
