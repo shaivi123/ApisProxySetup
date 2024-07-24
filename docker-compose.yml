@@ -12,7 +12,7 @@ services:
       - NORDVPN_COUNTRY=United_States  # Explicitly set the country
       - NORDVPN_CATEGORY=standard  # Optional, specify category if needed
     ports:
-      - "80:80"    # Expose the HTTP port
+      - "8001:8001"    # Expose the HTTP port
       - "443:443"  # Expose the HTTPS port if needed
     devices:
       - /dev/net/tun
@@ -40,7 +40,7 @@ services:
       - NORDVPN_COUNTRY=Italy  # Explicitly set the country
       - NORDVPN_CATEGORY=standard  # Optional, specify category if needed
     ports:
-      - "82:82"    # Expose the HTTP port
+      - "8002:8002"    # Expose the HTTP port
       - "446:446"  # Expose the HTTPS port if needed
     devices:
       - /dev/net/tun

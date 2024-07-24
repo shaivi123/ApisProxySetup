@@ -9,7 +9,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Copy SSL certificates
 # COPY certs/ca-certificates.crt /etc/nginx/certs/ca-certificates.crt
 
-EXPOSE 80
+EXPOSE 8001
 EXPOSE 443
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
