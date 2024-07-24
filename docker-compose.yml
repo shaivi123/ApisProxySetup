@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  nordvpn:
+  us_nordvpn:
     image: bubuntux/nordvpn
     cap_add:
       - NET_ADMIN
@@ -20,16 +20,16 @@ services:
   reverse-proxy:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-us
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf  # Correct path to nginx.conf
+      - ./nginx-us.conf:/etc/nginx/nginx.conf  # Correct path to nginx.conf
       - ./certs:/etc/nginx/certs           # Mount certificates directory for NGINX
     depends_on:
-      - nordvpn
+      - us_nordvpn
     restart: always
-    network_mode: service:nordvpn  # Share network with nordvpn service
+    network_mode: service:us_nordvpn  # Share network with nordvpn service
 
-  nordvpn-v2:
+  nordvpn-italy:
     image: bubuntux/nordvpn
     cap_add:
       - NET_ADMIN
@@ -48,14 +48,12 @@ services:
   reverse-proxy-v2:
     build:
       context: .
-      dockerfile: DockerfileV2
+      dockerfile: Dockerfile-italy
     volumes:
-      - ./nginxv2.conf:/etc/nginx/nginx.conf  # Correct path to nginx.conf
+      - ./nginx-italy.conf:/etc/nginx/nginx.conf  # Correct path to nginx.conf
       - ./certs:/etc/nginx/certs           # Mount certificates directory for NGINX
     depends_on:
-      - nordvpn-v2
+      - nordvpn-italy
     restart: always
-    network_mode: service:nordvpn-v2  # Share network with nordvpn service
+    network_mode: service:nordvpn-italy  # Share network with nordvpn service
     
-    # in PostMan: GET  | http://localhost |header: Connection=keep-alive , X-Proxy-URL=https://api.ipdata.co?api-key=93496b5c15d334d2ef27da33047f4a67b21043038fe3c0b48ad6ee82,
-    # X-Proxy-Host=api.ipdata.co,X-Proxy-Ip=8.8.8.8, Cookie=__cflb=0H28vFHtoAR1ohjxFffpsanyHA9PyT2YRgKduTeAheC
