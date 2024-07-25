@@ -7,27 +7,28 @@ services:
       - NET_ADMIN
     environment:
       - TOKEN=e9f2ab1346dd235938e478812fee2d88bcd29b2a60ea56194c7eb6e9180a13ed
-      - CONNECT=United_States  # Explicitly connect to a US server
+      - CONNECT=United_States
       - NETWORK=192.168.1.0/24
-      - NORDVPN_COUNTRY=United_States  # Explicitly set the country
-      - NORDVPN_CATEGORY=standard  # Optional, specify category if needed
+      - NORDVPN_COUNTRY=United_States
+      - NORDVPN_CATEGORY=standard
     ports:
-      - "8001:8001"    # Expose the HTTP port
-      - "443:443"  # Expose the HTTPS port if needed
+      - "8001:8001"
+      - "443:443"
     devices:
       - /dev/net/tun
     restart: always
+
   reverse-proxy:
     build:
       context: .
       dockerfile: Dockerfile-us
     volumes:
-      - ./nginx-us.conf:/etc/nginx/nginx.conf  # Correct path to nginx.conf
-      - ./certs:/etc/nginx/certs           # Mount certificates directory for NGINX
+      - ./nginx-us.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
     depends_on:
       - us_nordvpn
     restart: always
-    network_mode: service:us_nordvpn  # Share network with nordvpn service
+    network_mode: service:us_nordvpn
 
   nordvpn-italy:
     image: bubuntux/nordvpn
@@ -35,25 +36,42 @@ services:
       - NET_ADMIN
     environment:
       - TOKEN=e9f2ab1346dd235938e478812fee2d88bcd29b2a60ea56194c7eb6e9180a13ed
-      - CONNECT=Italy  # Explicitly connect to a US server
+      - CONNECT=Italy
       - NETWORK=192.168.1.0/24
-      - NORDVPN_COUNTRY=Italy  # Explicitly set the country
-      - NORDVPN_CATEGORY=standard  # Optional, specify category if needed
+      - NORDVPN_COUNTRY=Italy
+      - NORDVPN_CATEGORY=standard
     ports:
-      - "8002:8002"    # Expose the HTTP port
-      - "446:446"  # Expose the HTTPS port if needed
+      - "8002:8002"
+      - "446:446"
     devices:
       - /dev/net/tun
     restart: always
+
   reverse-proxy-v2:
     build:
       context: .
       dockerfile: Dockerfile-italy
     volumes:
-      - ./nginx-italy.conf:/etc/nginx/nginx.conf  # Correct path to nginx.conf
-      - ./certs:/etc/nginx/certs           # Mount certificates directory for NGINX
+      - ./nginx-italy.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
     depends_on:
       - nordvpn-italy
     restart: always
-    network_mode: service:nordvpn-italy  # Share network with nordvpn service
-    
+    network_mode: service:nordvpn-italy
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx-common.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - reverse-proxy
+      - reverse-proxy-v2
+    # networks:
+    #   - apisproxysetup_default
+
+# networks:
+#   apisproxysetup_default:
+#     external: true
