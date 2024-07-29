@@ -9,7 +9,9 @@ COPY nginx-us.conf /etc/nginx/nginx.conf
 # Copy SSL certificates
 # COPY certs/ca-certificates.crt /etc/nginx/certs/ca-certificates.crt
 
+# HEALTHCHECK --interval=5s --timeout=2s CMD curl --fail http://localhost || kill 1
+
 EXPOSE 8001
-EXPOSE 443
+# EXPOSE 443
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]

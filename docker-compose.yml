@@ -1,24 +1,30 @@
 version: '3.8'
 
 services:
-  us_nordvpn:
+  us-nordvpn:
     image: bubuntux/nordvpn
     cap_add:
       - NET_ADMIN
     environment:
-      - TOKEN=e9f2ab1346dd235938e478812fee2d88bcd29b2a60ea56194c7eb6e9180a13ed
+      - TOKEN=${TOKEN}
       - CONNECT=United_States
-      - NETWORK=192.168.1.0/24
+      - NETWORK=${NETWORK}
       - NORDVPN_COUNTRY=United_States
-      - NORDVPN_CATEGORY=standard
+      - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
     ports:
-      - "8001:8001"
-      - "443:443"
+      - "8001:8001"  
     devices:
       - /dev/net/tun
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/vpn-healthcheck.sh"]             #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+      interval: 1m                                           #How often to run the health check
+      timeout: 20s                                           #The maximum time to allow the health check to run
+      retries: 12                                            #The number of consecutive failures needed before considering the container as unhealthy
+    volumes:
+      - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
 
-  reverse-proxy:
+  reverse-proxy-us:
     build:
       context: .
       dockerfile: Dockerfile-us
@@ -26,28 +32,34 @@ services:
       - ./nginx-us.conf:/etc/nginx/nginx.conf
       - ./certs:/etc/nginx/certs
     depends_on:
-      - us_nordvpn
+      - us-nordvpn
     restart: always
-    network_mode: service:us_nordvpn
+    network_mode: service:us-nordvpn
 
-  nordvpn-italy:
+  italy-nordvpn:
     image: bubuntux/nordvpn
     cap_add:
       - NET_ADMIN
     environment:
-      - TOKEN=e9f2ab1346dd235938e478812fee2d88bcd29b2a60ea56194c7eb6e9180a13ed
+      - TOKEN=${TOKEN}
       - CONNECT=Italy
-      - NETWORK=192.168.1.0/24
+      - NETWORK=${NETWORK}
       - NORDVPN_COUNTRY=Italy
-      - NORDVPN_CATEGORY=standard
+      - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
     ports:
-      - "8002:8002"
-      - "446:446"
+      - "8002:8002"  
     devices:
       - /dev/net/tun
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/vpn-healthcheck.sh"]       #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+      interval: 1m                                     #How often to run the health check
+      timeout: 20s                                     #The maximum time to allow the health check to run
+      retries: 12                                      #The number of consecutive failures needed before considering the container as unhealthy
+    volumes:
+      - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
 
-  reverse-proxy-v2:
+  reverse-proxy-it:
     build:
       context: .
       dockerfile: Dockerfile-italy
@@ -55,9 +67,381 @@ services:
       - ./nginx-italy.conf:/etc/nginx/nginx.conf
       - ./certs:/etc/nginx/certs
     depends_on:
-      - nordvpn-italy
+      - italy-nordvpn
     restart: always
-    network_mode: service:nordvpn-italy
+    network_mode: service:italy-nordvpn
+
+
+
+
+  
+  ####################################################################################################################################################################################################
+
+  japan-nordvpn:
+    image: bubuntux/nordvpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TOKEN=${TOKEN}
+      - CONNECT=Japan
+      - NETWORK=${NETWORK}
+      - NORDVPN_COUNTRY=Japan
+      - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
+    ports:
+      - "8003:8003"  
+    devices:
+      - /dev/net/tun
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/vpn-healthcheck.sh"]             #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+      interval: 1m                                           #How often to run the health check
+      timeout: 20s                                           #The maximum time to allow the health check to run
+      retries: 12                                            #The number of consecutive failures needed before considering the container as unhealthy
+    volumes:
+      - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
+
+  reverse-proxy-japan:
+    build:
+      context: .
+      dockerfile: Dockerfile-japan
+    volumes:
+      - ./nginx-japan.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+    depends_on:
+      - japan-nordvpn
+    restart: always
+    network_mode: service:japan-nordvpn
+
+
+
+  germany-nordvpn:
+    image: bubuntux/nordvpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TOKEN=${TOKEN}
+      - CONNECT=Germany
+      - NETWORK=${NETWORK}
+      - NORDVPN_COUNTRY=Germany
+      - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
+    ports:
+      - "8004:8004"  
+    devices:
+      - /dev/net/tun
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/vpn-healthcheck.sh"]             #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+      interval: 1m                                           #How often to run the health check
+      timeout: 20s                                           #The maximum time to allow the health check to run
+      retries: 12                                            #The number of consecutive failures needed before considering the container as unhealthy
+    volumes:
+      - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
+
+  reverse-proxy-germany:
+    build:
+      context: .
+      dockerfile: Dockerfile-germany
+    volumes:
+      - ./nginx-germany.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+    depends_on:
+      - germany-nordvpn
+    restart: always
+    network_mode: service:germany-nordvpn
+
+
+
+  canada-nordvpn:
+    image: bubuntux/nordvpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TOKEN=${TOKEN}
+      - CONNECT=Canada
+      - NETWORK=${NETWORK}
+      - NORDVPN_COUNTRY=Canada
+      - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
+    ports:
+      - "8005:8005"  
+    devices:
+      - /dev/net/tun
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/vpn-healthcheck.sh"]             #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+      interval: 1m                                           #How often to run the health check
+      timeout: 20s                                           #The maximum time to allow the health check to run
+      retries: 12                                            #The number of consecutive failures needed before considering the container as unhealthy
+    volumes:
+      - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
+
+  reverse-proxy-canada:
+    build:
+      context: .
+      dockerfile: Dockerfile-canada
+    volumes:
+      - ./nginx-canada.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+    depends_on:
+      - canada-nordvpn
+    restart: always
+    network_mode: service:canada-nordvpn
+
+
+  spain-nordvpn:
+    image: bubuntux/nordvpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TOKEN=${TOKEN}
+      - CONNECT=Spain
+      - NETWORK=${NETWORK}
+      - NORDVPN_COUNTRY=Spain
+      - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
+    ports:
+      - "8006:8006"  
+    devices:
+      - /dev/net/tun
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/vpn-healthcheck.sh"]             #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+      interval: 1m                                           #How often to run the health check
+      timeout: 20s                                           #The maximum time to allow the health check to run
+      retries: 12                                            #The number of consecutive failures needed before considering the container as unhealthy
+    volumes:
+      - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
+
+  reverse-proxy-spain:
+    build:
+      context: .
+      dockerfile: Dockerfile-spain
+    volumes:
+      - ./nginx-spain.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+    depends_on:
+      - spain-nordvpn
+    restart: always
+    network_mode: service:spain-nordvpn
+
+
+  brazil-nordvpn:
+    image: bubuntux/nordvpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TOKEN=${TOKEN}
+      - CONNECT=Brazil
+      - NETWORK=${NETWORK}
+      - NORDVPN_COUNTRY=Brazil
+      - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
+    ports:
+      - "8007:8007"  
+    devices:
+      - /dev/net/tun
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/vpn-healthcheck.sh"]             #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+      interval: 1m                                           #How often to run the health check
+      timeout: 20s                                           #The maximum time to allow the health check to run
+      retries: 12                                            #The number of consecutive failures needed before considering the container as unhealthy
+    volumes:
+      - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
+
+  reverse-proxy-brazil:
+    build:
+      context: .
+      dockerfile: Dockerfile-brazil
+    volumes:
+      - ./nginx-brazil.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+    depends_on:
+      - brazil-nordvpn
+    restart: always
+    network_mode: service:brazil-nordvpn
+
+
+  ireland-nordvpn:
+    image: bubuntux/nordvpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TOKEN=${TOKEN}
+      - CONNECT=Ireland
+      - NETWORK=${NETWORK}
+      - NORDVPN_COUNTRY=Ireland
+      - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
+    ports:
+      - "8008:8008"  
+    devices:
+      - /dev/net/tun
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/vpn-healthcheck.sh"]             #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+      interval: 1m                                           #How often to run the health check
+      timeout: 20s                                           #The maximum time to allow the health check to run
+      retries: 12                                            #The number of consecutive failures needed before considering the container as unhealthy
+    volumes:
+      - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
+
+  reverse-proxy-ireland:
+    build:
+      context: .
+      dockerfile: Dockerfile-ireland
+    volumes:
+      - ./nginx-ireland.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+    depends_on:
+      - ireland-nordvpn
+    restart: always
+    network_mode: service:ireland-nordvpn
+
+
+
+  srilanka-nordvpn:
+    image: bubuntux/nordvpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TOKEN=${TOKEN}
+      - CONNECT=Sri_Lanka
+      - NETWORK=${NETWORK}
+      - NORDVPN_COUNTRY=Sri_Lanka
+      - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
+    ports:
+      - "8009:8009"  
+    devices:
+      - /dev/net/tun
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/vpn-healthcheck.sh"]             #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+      interval: 1m                                           #How often to run the health check
+      timeout: 20s                                           #The maximum time to allow the health check to run
+      retries: 12                                            #The number of consecutive failures needed before considering the container as unhealthy
+    volumes:
+      - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
+
+  reverse-proxy-srilanka:
+    build:
+      context: .
+      dockerfile: Dockerfile-srilanka
+    volumes:
+      - ./nginx-srilanka.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+    depends_on:
+      - srilanka-nordvpn
+    restart: always
+    network_mode: service:srilanka-nordvpn
+
+
+
+  pakistan-nordvpn:
+    image: bubuntux/nordvpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - TOKEN=${TOKEN}
+      - CONNECT=Pakistan
+      - NETWORK=${NETWORK}
+      - NORDVPN_COUNTRY=Pakistan
+      - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
+    ports:
+      - "8010:8010"  
+    devices:
+      - /dev/net/tun
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "/vpn-healthcheck.sh"]             #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+      interval: 1m                                           #How often to run the health check
+      timeout: 20s                                           #The maximum time to allow the health check to run
+      retries: 12                                            #The number of consecutive failures needed before considering the container as unhealthy
+    volumes:
+      - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
+
+  reverse-proxy-pakistan:
+    build:
+      context: .
+      dockerfile: Dockerfile-pakistan
+    volumes:
+      - ./nginx-pakistan.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+    depends_on:
+      - pakistan-nordvpn
+    restart: always
+    network_mode: service:pakistan-nordvpn
+
+
+  # india-nordvpn:
+  #   image: bubuntux/nordvpn
+  #   cap_add:
+  #     - NET_ADMIN
+  #   environment:
+  #     - TOKEN=${TOKEN}
+  #     - CONNECT=India
+  #     - NETWORK=${NETWORK}
+  #     - NORDVPN_COUNTRY=India
+  #     - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
+  #   ports:
+  #     - "8011:8011"  
+  #   devices:
+  #     - /dev/net/tun
+  #   restart: always
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "/vpn-healthcheck.sh"]             #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+  #     interval: 1m                                           #How often to run the health check
+  #     timeout: 20s                                           #The maximum time to allow the health check to run
+  #     retries: 12                                            #The number of consecutive failures needed before considering the container as unhealthy
+  #   volumes:
+  #     - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
+
+  # reverse-proxy-india:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-india
+  #   volumes:
+  #     - ./nginx-india.conf:/etc/nginx/nginx.conf
+  #     - ./certs:/etc/nginx/certs
+  #   depends_on:
+  #     - india-nordvpn
+  #   restart: always
+  #   network_mode: service:india-nordvpn
+
+  # bangladesh-nordvpn:
+  #   image: bubuntux/nordvpn
+  #   cap_add:
+  #     - NET_ADMIN
+  #   environment:
+  #     - TOKEN=${TOKEN}
+  #     - CONNECT=Bangladesh
+  #     - NETWORK=${NETWORK}
+  #     - NORDVPN_COUNTRY=Bangladesh
+  #     - NORDVPN_CATEGORY=${NORDVPN_CATEGORY}
+  #   ports:
+  #     - "8012:8012"  
+  #   devices:
+  #     - /dev/net/tun
+  #   restart: always
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "/vpn-healthcheck.sh"]             #Specifies the command to run to check the health of the container. In this case, it's the script /vpn-healthcheck.sh.
+  #     interval: 1m                                           #How often to run the health check
+  #     timeout: 20s                                           #The maximum time to allow the health check to run
+  #     retries: 12                                            #The number of consecutive failures needed before considering the container as unhealthy
+  #   volumes:
+  #     - ./vpn-healthcheck.sh:/vpn-healthcheck.sh
+
+  # reverse-proxy-bangladesh:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-bangladesh
+  #   volumes:
+  #     - ./nginx-bangladesh.conf:/etc/nginx/nginx.conf
+  #     - ./certs:/etc/nginx/certs
+  #   depends_on:
+  #     - bangladesh-nordvpn
+  #   restart: always
+  #   network_mode: service:bangladesh-nordvpn                   
+
+
+
+  ########################################################################################################################################################################################  
 
   nginx:
     image: nginx:latest
@@ -67,11 +451,15 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - reverse-proxy
-      - reverse-proxy-v2
-    # networks:
-    #   - apisproxysetup_default
-
-# networks:
-#   apisproxysetup_default:
-#     external: true
+      - reverse-proxy-us
+      - reverse-proxy-it
+      - reverse-proxy-japan
+      - reverse-proxy-germany
+      - reverse-proxy-canada
+      - reverse-proxy-spain
+      - reverse-proxy-brazil
+      - reverse-proxy-ireland
+      - reverse-proxy-srilanka
+      - reverse-proxy-pakistan
+      # - reverse-proxy-india
+      # - reverse-proxy-bangladesh
